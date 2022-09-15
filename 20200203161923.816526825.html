@@ -1,0 +1,362 @@
+<html><head><title>[PATCH 5.4 48/90] qmi_wwan: Add support for Quectel RM500Q - Greg Kroah-Hartman</title><link
+rel=alternate
+title="Atom feed"
+href="../new.atom"
+type="application/atom+xml"/><style>pre{white-space:pre-wrap}*{font-size:100%;font-family:monospace}</style><link
+type=text/css
+rel=stylesheet
+href=../216light.css?6184287d
+media=screen,print /><link
+type=text/css
+rel=stylesheet
+href=../216dark.css?611bb54b
+media="screen and (prefers-color-scheme:dark)" /></head><body><form
+action="../"><pre><a
+href="../?t=20200203163541"><b>stable.vger.kernel.org archive mirror</b></a>
+<input
+name=q
+type=text /><input
+type=submit
+value=search /> <a
+href="../_/text/help/">help</a> / <a
+href="../_/text/color/">color</a> / <a
+id=mirror
+href="../_/text/mirror/">mirror</a> / <a
+href="../new.atom">Atom feed</a></pre></form><pre
+id=b>From: Greg Kroah-Hartman &lt;gregkh@linuxfoundation.org&gt;
+To: linux-kernel@vger.kernel.org
+Cc: &#34;Greg Kroah-Hartman&#34; &lt;gregkh@linuxfoundation.org&gt;,
+	stable@vger.kernel.org,
+	&#34;Kristian Evensen&#34; &lt;kristian.evensen@gmail.com&gt;,
+	&#34;Bj&#248;rn Mork&#34; &lt;bjorn@mork.no&gt;, &#34;Jakub Kicinski&#34; &lt;kuba@kernel.org&gt;,
+	&#34;Sasha Levin&#34; &lt;sashal@kernel.org&gt;
+Subject: <a
+href="#r"
+id=t>[PATCH 5.4 48/90] qmi_wwan: Add support for Quectel RM500Q</a>
+Date: Mon,  3 Feb 2020 16:19:51 +0000	<a
+href="#r">[thread overview]</a>
+Message-ID: &lt;20200203161923.816526825@linuxfoundation.org&gt; (<a
+href="raw">raw</a>)
+In-Reply-To: &lt;<a
+href="../20200203161917.612554987@linuxfoundation.org/">20200203161917.612554987@linuxfoundation.org</a>&gt;
+
+From: Kristian Evensen &lt;kristian.evensen@gmail.com&gt;
+
+[ Upstream commit a9ff44f0e61d074f29770413fef6a5452be7b83e ]
+
+RM500Q is a 5G module from Quectel, supporting both standalone and
+non-standalone modes. The normal Quectel quirks apply (DTR and dynamic
+interface numbers).
+
+Signed-off-by: Kristian Evensen &lt;kristian.evensen@gmail.com&gt;
+Acked-by: Bj&#248;rn Mork &lt;bjorn@mork.no&gt;
+Signed-off-by: Jakub Kicinski &lt;kuba@kernel.org&gt;
+Signed-off-by: Sasha Levin &lt;sashal@kernel.org&gt;
+---
+ <a
+id=iZ31drivers:net:usb:qmi_wwan.c
+href=#Z31drivers:net:usb:qmi_wwan.c>drivers/net/usb/qmi_wwan.c</a> | 1 +
+ 1 file changed, 1 insertion(+)
+
+<span
+class="head"><a
+href=#iZ31drivers:net:usb:qmi_wwan.c
+id=Z31drivers:net:usb:qmi_wwan.c>diff</a> --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+index 4196c0e327403..9485c8d1de8a3 100644
+--- a/drivers/net/usb/qmi_wwan.c
++++ b/drivers/net/usb/qmi_wwan.c
+</span><span
+class="hunk">@@ -1062,6 +1062,7 @@ static const struct usb_device_id products[] = {
+</span> 	{QMI_QUIRK_QUECTEL_DYNCFG(0x2c7c, 0x0125)},	/* Quectel EC25, EC20 R2.0  Mini PCIe */
+ 	{QMI_QUIRK_QUECTEL_DYNCFG(0x2c7c, 0x0306)},	/* Quectel EP06/EG06/EM06 */
+ 	{QMI_QUIRK_QUECTEL_DYNCFG(0x2c7c, 0x0512)},	/* Quectel EG12/EM12 */
+<span
+class="add">+	{QMI_QUIRK_QUECTEL_DYNCFG(0x2c7c, 0x0800)},	/* Quectel RM500Q-GL */
+</span> 
+ 	/* 3. Combined interface devices matching on interface number */
+ 	{QMI_FIXED_INTF(0x0408, 0xea42, 4)},	/* Yota / Megafon M100-1 */
+-- 
+2.20.1
+
+
+
+</pre><hr><pre><a
+href="../20200203161923.915835469@linuxfoundation.org/"
+rel=next>next</a> <a
+href="../20200203161923.726179092@linuxfoundation.org/"
+rel=prev>prev</a> <a
+href="../20200203161917.612554987@linuxfoundation.org/">parent</a> <a
+href="#R">reply</a>	other threads:[<a
+href="../?t=20200203163541">~2020-02-03 16:35 UTC</a>|<a
+href="../">newest</a>]
+
+<b>Thread overview: </b>111+ messages / expand[<a
+href="T/#u">flat</a>|<a
+href="t/#u">nested</a>]  <a
+href="t.mbox.gz">mbox.gz</a>  <a
+href="t.atom">Atom feed</a>  <a
+href="#b">top</a>
+2020-02-03 16:19 <a
+href="../20200203161917.612554987@linuxfoundation.org/">[PATCH 5.4 00/90] 5.4.18-stable review</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161917.784791200@linuxfoundation.org/">[PATCH 5.4 01/90] vfs: fix do_last() regression</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161917.912939807@linuxfoundation.org/">[PATCH 5.4 02/90] cifs: fix soft mounts hanging in the reconnect code</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161918.046940997@linuxfoundation.org/">[PATCH 5.4 03/90] x86/resctrl: Fix a deadlock due to inaccurate reference</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161918.178616188@linuxfoundation.org/">[PATCH 5.4 04/90] x86/resctrl: Fix use-after-free when deleting resource groups</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161918.304723675@linuxfoundation.org/">[PATCH 5.4 05/90] x86/resctrl: Fix use-after-free due to inaccurate refcount of rdtgroup</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161918.428841772@linuxfoundation.org/">[PATCH 5.4 06/90] e1000e: Drop unnecessary __E1000_DOWN bit twiddling</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161918.551273833@linuxfoundation.org/">[PATCH 5.4 07/90] e1000e: Revert &#34;e1000e: Make watchdog use delayed work&#34;</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161918.669230239@linuxfoundation.org/">[PATCH 5.4 08/90] gfs2: Another gfs2_find_jhead fix</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161918.812118193@linuxfoundation.org/">[PATCH 5.4 09/90] perf c2c: Fix return type for histogram sorting comparision functions</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161918.968758819@linuxfoundation.org/">[PATCH 5.4 10/90] PM / devfreq: Add new name attribute for sysfs</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161919.110051704@linuxfoundation.org/">[PATCH 5.4 11/90] tools lib: Fix builds when glibc contains strlcpy()</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161919.250707139@linuxfoundation.org/">[PATCH 5.4 12/90] arm64: kbuild: remove compressed images on make ARCH=arm64 (dist)clean</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161919.389626881@linuxfoundation.org/">[PATCH 5.4 13/90] mm/mempolicy.c: fix out of bounds write in mpol_parse_str()</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161919.541691207@linuxfoundation.org/">[PATCH 5.4 14/90] reiserfs: Fix memory leak of journal device string</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161919.685182477@linuxfoundation.org/">[PATCH 5.4 15/90] media: digitv: dont continue if remote control state cant be read</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161919.874815094@linuxfoundation.org/">[PATCH 5.4 16/90] media: af9005: uninitialized variable printked</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161919.993540310@linuxfoundation.org/">[PATCH 5.4 17/90] media: vp7045: do not read uninitialized values if usb transfer fails</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161920.107897723@linuxfoundation.org/">[PATCH 5.4 18/90] media: gspca: zero usb_buf</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161920.218827702@linuxfoundation.org/">[PATCH 5.4 19/90] media: dvb-usb/dvb-usb-urb.c: initialize actlen to 0</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161920.345794713@linuxfoundation.org/">[PATCH 5.4 20/90] tomoyo: Use atomic_t for statistics counter</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161920.467142960@linuxfoundation.org/">[PATCH 5.4 21/90] ttyprintk: fix a potential deadlock in interrupt context issue</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161920.591354269@linuxfoundation.org/">[PATCH 5.4 22/90] Bluetooth: Fix race condition in hci_release_sock()</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161920.701201485@linuxfoundation.org/">[PATCH 5.4 23/90] cgroup: Prevent double killing of css when enabling threaded cgroup</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161920.818308603@linuxfoundation.org/">[PATCH 5.4 24/90] clk: sunxi-ng: v3s: Fix incorrect number of hw_clks</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161920.928315872@linuxfoundation.org/">[PATCH 5.4 25/90] arm64: dts: meson-sm1-sei610: add gpio bluetooth interrupt</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161921.061213173@linuxfoundation.org/">[PATCH 5.4 26/90] ARM: dts: sun8i: a83t: Correct USB3503 GPIOs polarity</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161921.206999917@linuxfoundation.org/">[PATCH 5.4 27/90] ARM: dts: am57xx-beagle-x15/am57xx-idk: Remove &#34;gpios&#34; for endpoint dt nodes</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161921.342861160@linuxfoundation.org/">[PATCH 5.4 28/90] ARM: dts: beagle-x15-common: Model 5V0 regulator</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161921.600701756@linuxfoundation.org/">[PATCH 5.4 29/90] soc: ti: wkup_m3_ipc: Fix race condition with rproc_boot</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161921.721006505@linuxfoundation.org/">[PATCH 5.4 30/90] tools lib traceevent: Fix memory leakage in filter_event</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161921.828621507@linuxfoundation.org/">[PATCH 5.4 31/90] rseq: Unregister rseq for clone CLONE_VM</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161921.931106732@linuxfoundation.org/">[PATCH 5.4 32/90] clk: sunxi-ng: sun8i-r: Fix divider on APB0 clock</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161922.055743609@linuxfoundation.org/">[PATCH 5.4 33/90] clk: sunxi-ng: h6-r: Fix AR100/R_APB2 parent order</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161922.190564249@linuxfoundation.org/">[PATCH 5.4 34/90] mac80211: mesh: restrict airtime metric to peered established plinks</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161922.317929140@linuxfoundation.org/">[PATCH 5.4 35/90] clk: mmp2: Fix the order of timer mux parents</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161922.450876464@linuxfoundation.org/">[PATCH 5.4 36/90] ASoC: rt5640: Fix NULL dereference on module unload</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161922.565075558@linuxfoundation.org/">[PATCH 5.4 37/90] s390/zcrypt: move ap device reset from bus to driver code</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161922.708588217@linuxfoundation.org/">[PATCH 5.4 38/90] i40e: Fix virtchnl_queue_select bitmap validation</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161922.839994625@linuxfoundation.org/">[PATCH 5.4 39/90] ixgbevf: Remove limit of 10 entries for unicast filter list</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161922.965356959@linuxfoundation.org/">[PATCH 5.4 40/90] ixgbe: Fix calculation of queue with VFs and flow director on interface flap</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161923.099172116@linuxfoundation.org/">[PATCH 5.4 41/90] igb: Fix SGMII SFP module discovery for 100FX/LX</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161923.209520709@linuxfoundation.org/">[PATCH 5.4 42/90] iavf: remove current MAC address filter on VF reset</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161923.329640270@linuxfoundation.org/">[PATCH 5.4 43/90] platform/x86: GPD pocket fan: Allow somewhat lower/higher temperature limits</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161923.441970979@linuxfoundation.org/">[PATCH 5.4 44/90] platform/x86: intel_pmc_core: update Comet Lake platform driver</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161923.547205729@linuxfoundation.org/">[PATCH 5.4 45/90] ASoC: SOF: Intel: fix HDA codec driver probe with multiple controllers</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161923.638680544@linuxfoundation.org/">[PATCH 5.4 46/90] ASoC: hdac_hda: Fix error in driver removal after failed probe</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161923.726179092@linuxfoundation.org/">[PATCH 5.4 47/90] ASoC: sti: fix possible sleep-in-atomic</a> Greg Kroah-Hartman
+<b>2020-02-03 16:19 ` <a
+id=r
+href="#t">Greg Kroah-Hartman [this message]</a></b>
+2020-02-03 16:19 ` <a
+href="../20200203161923.915835469@linuxfoundation.org/">[PATCH 5.4 49/90] parisc: Use proper printk format for resource_size_t</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161924.011424134@linuxfoundation.org/">[PATCH 5.4 50/90] lkdtm/bugs: fix build error in lkdtm_UNSET_SMEP</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161924.108407734@linuxfoundation.org/">[PATCH 5.4 51/90] wireless: fix enabling channel 12 for custom regulatory domain</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161924.195422938@linuxfoundation.org/">[PATCH 5.4 52/90] cfg80211: Fix radar event during another phy CAC</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161924.283085792@linuxfoundation.org/">[PATCH 5.4 53/90] mac80211: Fix TKIP replay protection immediately after key setup</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161924.377160222@linuxfoundation.org/">[PATCH 5.4 54/90] wireless: wext: avoid gcc -O3 warning</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161924.464976443@linuxfoundation.org/">[PATCH 5.4 55/90] perf/x86/intel/uncore: Add PCI ID of IMC for Xeon E3 V5 Family</a> Greg Kroah-Hartman
+2020-02-03 16:19 ` <a
+href="../20200203161924.560277798@linuxfoundation.org/">[PATCH 5.4 56/90] perf/x86/intel/uncore: Remove PCIe3 unit for SNR</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161924.646965399@linuxfoundation.org/">[PATCH 5.4 57/90] riscv: delete temporary files</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161924.732994819@linuxfoundation.org/">[PATCH 5.4 58/90] riscv: Less inefficient gcc tishift helpers (and export their symbols)</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161924.828775805@linuxfoundation.org/">[PATCH 5.4 59/90] XArray: Fix xas_pause at ULONG_MAX</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161924.922125996@linuxfoundation.org/">[PATCH 5.4 60/90] iwlwifi: pcie: allocate smaller dev_cmd for TX headers</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161925.037188062@linuxfoundation.org/">[PATCH 5.4 61/90] iwlwifi: mvm: fix NVM check for 3168 devices</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161925.150558357@linuxfoundation.org/">[PATCH 5.4 62/90] iwlwifi: Dont ignore the cap field upon mcc update</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161925.257127968@linuxfoundation.org/">[PATCH 5.4 63/90] iwlwifi: dbg: force stop the debug monitor HW</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161925.352904126@linuxfoundation.org/">[PATCH 5.4 64/90] Input: evdev - convert kzalloc()/vzalloc() to kvzalloc()</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161925.451117468@linuxfoundation.org/">[PATCH 5.4 65/90] Input: aiptek - use descriptors of current altsetting</a> Greg Kroah-Hartman
+2020-02-04  8:11   ` <a
+href="../20200204081155.GC26725@localhost/">Johan Hovold</a>
+2020-02-04 10:03     ` <a
+href="../20200204100332.GC1088789@kroah.com/">Greg Kroah-Hartman</a>
+2020-02-04 10:18       ` <a
+href="../20200204101855.GI26725@localhost/">Johan Hovold</a>
+2020-02-05  9:28         ` <a
+href="../20200205092837.GA1164405@kroah.com/">Greg Kroah-Hartman</a>
+2020-02-03 16:20 ` <a
+href="../20200203161925.567987747@linuxfoundation.org/">[PATCH 5.4 66/90] ARM: dts: am335x-boneblack-common: fix memory size</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161925.664813257@linuxfoundation.org/">[PATCH 5.4 67/90] vti[6]: fix packet tx through bpf_redirect()</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161925.784093908@linuxfoundation.org/">[PATCH 5.4 68/90] xfrm interface:</a> &#34; Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161925.873480341@linuxfoundation.org/">[PATCH 5.4 69/90] xfrm: interface: do not confirm neighbor when do pmtu update</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161925.971200751@linuxfoundation.org/">[PATCH 5.4 70/90] Input: max77650-onkey - add of_match table</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161926.071561120@linuxfoundation.org/">[PATCH 5.4 71/90] scsi: fnic: do not queue commands during fwreset</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161926.170195650@linuxfoundation.org/">[PATCH 5.4 72/90] ARM: 8955/1: virt: Relax arch timer version check during early boot</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161926.266715392@linuxfoundation.org/">[PATCH 5.4 73/90] led: max77650: add of_match table</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161926.370960124@linuxfoundation.org/">[PATCH 5.4 74/90] tee: optee: Fix compilation issue with nommu</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161926.483033307@linuxfoundation.org/">[PATCH 5.4 75/90] r8152: get default setting of WOL before initializing</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161926.561975576@linuxfoundation.org/">[PATCH 5.4 76/90] r8152: disable U2P3 for RTL8153B</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161926.657764538@linuxfoundation.org/">[PATCH 5.4 77/90] r8152: Disable PLA MCU clock speed down</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161926.755377982@linuxfoundation.org/">[PATCH 5.4 78/90] r8152: disable test IO for RTL8153B</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161926.839801919@linuxfoundation.org/">[PATCH 5.4 79/90] r8152: avoid the MCU to clear the lanwake</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161926.942360252@linuxfoundation.org/">[PATCH 5.4 80/90] r8152: disable DelayPhyPwrChg</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161927.038854624@linuxfoundation.org/">[PATCH 5.4 81/90] ARM: dts: am43x-epos-evm: set data pin directions for spi0 and spi1</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161927.139388793@linuxfoundation.org/">[PATCH 5.4 82/90] qlcnic: Fix CPU soft lockup while collecting firmware dump</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161927.230439847@linuxfoundation.org/">[PATCH 5.4 83/90] powerpc/fsl/dts: add fsl,erratum-a011043</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161927.325905755@linuxfoundation.org/">[PATCH 5.4 84/90] net/fsl: treat fsl,erratum-a011043</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161927.430171780@linuxfoundation.org/">[PATCH 5.4 85/90] net: fsl/fman: rename IF_MODE_XGMII to IF_MODE_10G</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161927.533931517@linuxfoundation.org/">[PATCH 5.4 86/90] seq_tab_next() should increase position index</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161927.644506604@linuxfoundation.org/">[PATCH 5.4 87/90] l2t_seq_next</a> &#34; Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161927.735006699@linuxfoundation.org/">[PATCH 5.4 88/90] netfilter: conntrack: sctp: use distinct states for new SCTP connections</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161927.827669434@linuxfoundation.org/">[PATCH 5.4 89/90] netfilter: nf_tables_offload: fix check the chain offload flag</a> Greg Kroah-Hartman
+2020-02-03 16:20 ` <a
+href="../20200203161927.937714547@linuxfoundation.org/">[PATCH 5.4 90/90] net: Fix skb-&gt;csum update in inet_proto_csum_replace16()</a> Greg Kroah-Hartman
+2020-02-03 21:40 ` <a
+href="../d129a50f-4e3f-b5d5-ca4f-877d4f62be27@nvidia.com/">[PATCH 5.4 00/90] 5.4.18-stable review</a> Jon Hunter
+2020-02-04 14:37 ` <a
+href="../9a5a92f2-6e28-a9ab-a851-8d7e56482df6@roeck-us.net/">Guenter Roeck</a>
+2020-02-05 15:06   ` <a
+href="../20200205150605.GA1236691@kroah.com/">Greg Kroah-Hartman</a>
+2020-02-05 16:25     ` <a
+href="../20200205162524.GC25403@roeck-us.net/">Guenter Roeck</a>
+2020-02-05 19:29       ` <a
+href="../20200205192945.GB1327971@kroah.com/">Greg Kroah-Hartman</a>
+2020-02-05 15:13   ` <a
+href="../20200205151357.GB1236691@kroah.com/">Greg Kroah-Hartman</a>
+2020-02-05 16:24     ` <a
+href="../20200205162429.GB25403@roeck-us.net/">Guenter Roeck</a>
+2020-02-05 19:30       ` <a
+href="../20200205193008.GC1327971@kroah.com/">Greg Kroah-Hartman</a>
+2020-02-05 21:01         ` <a
+href="../20200205210150.GA18483@roeck-us.net/">Guenter Roeck</a>
+2020-02-05 21:21           ` <a
+href="../20200205212129.GA1452440@kroah.com/">Greg Kroah-Hartman</a>
+2020-02-04 17:04 ` <a
+href="../CA+G9fYusNeJtrBBHL=dUFP3Z=-7Ri6qk6u8a0eZ=euQWU6=O4g@mail.gmail.com/">Naresh Kamboju</a>
+2020-02-04 17:20 ` <a
+href="../20200204172019.GE10163@roeck-us.net/">Guenter Roeck</a>
+2020-02-04 21:01 ` <a
+href="../20200204210157.31658-1-dmoulding@me.com/">[PATCH 5.4 61/90] iwlwifi: mvm: fix NVM check for 3168 devices</a> Dan Moulding
+2020-02-05  9:31   ` <a
+href="../20200205093102.GB1164405@kroah.com/">Greg KH</a>
+2020-03-13 15:13     ` <a
+href="../20200313151300.18957-1-dmoulding@me.com/">Dan Moulding</a>
+2020-03-17 10:21       ` <a
+href="../20200317102141.GB1130294@kroah.com/">Greg KH</a>
+</pre><hr><pre
+id=R><b>Reply instructions:</b>
+
+You may reply publicly to <a
+href=#t>this message</a> via plain-text email
+using any one of the following methods:
+
+* Save the following mbox file, import it into your mail client,
+  and reply-to-all from there: <a
+href=raw>mbox</a>
+
+  Avoid top-posting and favor interleaved quoting:
+  <a
+href="https://en.wikipedia.org/wiki/Posting_style#Interleaved_style">https://en.wikipedia.org/wiki/Posting_style#Interleaved_style</a>
+
+* Reply using the <b>--to</b>, <b>--cc</b>, and <b>--in-reply-to</b>
+  switches of git-send-email(1):
+
+  git send-email \
+    --in-reply-to=20200203161923.816526825@linuxfoundation.org \
+    --to=gregkh@linuxfoundation.org \
+    --cc=bjorn@mork.no \
+    --cc=kristian.evensen@gmail.com \
+    --cc=kuba@kernel.org \
+    --cc=linux-kernel@vger.kernel.org \
+    --cc=sashal@kernel.org \
+    --cc=stable@vger.kernel.org \
+    --subject=&#39;Re: [PATCH 5.4 48/90] qmi_wwan: Add support for Quectel RM500Q&#39; \
+    /path/to/YOUR_REPLY
+
+  <a
+href="https://kernel.org/pub/software/scm/git/docs/git-send-email.html">https://kernel.org/pub/software/scm/git/docs/git-send-email.html</a>
+
+* If your mail client supports setting the <b>In-Reply-To</b> header
+  via mailto: links, try the <a
+href="mailto:gregkh%40linuxfoundation.org?In-Reply-To=%3C20200203161923.816526825@linuxfoundation.org%3E&#38;Cc=bjorn%40mork.no%2Ckristian.evensen%40gmail.com%2Ckuba%40kernel.org%2Clinux-kernel%40vger.kernel.org%2Csashal%40kernel.org%2Cstable%40vger.kernel.org&#38;Subject=Re%3A%20%5BPATCH%205.4%2048%2F90%5D%20qmi_wwan%3A%20Add%20support%20for%20Quectel%20RM500Q">mailto: link</a>
+</pre>
+<hr><pre>This is a public inbox, see <a
+href="../_/text/mirror/">mirroring instructions</a>
+for how to clone and mirror all data and code used for this inbox;
+as well as URLs for NNTP newsgroup(s).</pre></body></html>

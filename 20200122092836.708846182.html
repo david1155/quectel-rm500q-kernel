@@ -1,0 +1,923 @@
+<html><head><title>[PATCH 5.4 044/222] USB: serial: option: Add support for Quectel RM500Q - Greg Kroah-Hartman</title><link
+rel=alternate
+title="Atom feed"
+href="../new.atom"
+type="application/atom+xml"/><style>pre{white-space:pre-wrap}*{font-size:100%;font-family:monospace}</style><link
+type=text/css
+rel=stylesheet
+href=../216light.css?6184287d
+media=screen,print /><link
+type=text/css
+rel=stylesheet
+href=../216dark.css?611bb54b
+media="screen and (prefers-color-scheme:dark)" /></head><body><form
+action="../"><pre><a
+href="../?t=20200122133155"><b>stable.vger.kernel.org archive mirror</b></a>
+<input
+name=q
+type=text /><input
+type=submit
+value=search /> <a
+href="../_/text/help/">help</a> / <a
+href="../_/text/color/">color</a> / <a
+id=mirror
+href="../_/text/mirror/">mirror</a> / <a
+href="../new.atom">Atom feed</a></pre></form><pre
+id=b>From: Greg Kroah-Hartman &lt;gregkh@linuxfoundation.org&gt;
+To: linux-kernel@vger.kernel.org
+Cc: Greg Kroah-Hartman &lt;gregkh@linuxfoundation.org&gt;,
+	stable@vger.kernel.org,
+	Kristian Evensen &lt;kristian.evensen@gmail.com&gt;,
+	Johan Hovold &lt;johan@kernel.org&gt;
+Subject: <a
+href="#r"
+id=t>[PATCH 5.4 044/222] USB: serial: option: Add support for Quectel RM500Q</a>
+Date: Wed, 22 Jan 2020 10:27:10 +0100	<a
+href="#r">[thread overview]</a>
+Message-ID: &lt;20200122092836.708846182@linuxfoundation.org&gt; (<a
+href="raw">raw</a>)
+In-Reply-To: &lt;<a
+href="../20200122092833.339495161@linuxfoundation.org/">20200122092833.339495161@linuxfoundation.org</a>&gt;
+
+From: Kristian Evensen &lt;kristian.evensen@gmail.com&gt;
+
+commit accf227de4d211b52c830a58b2df00d5739f2389 upstream.
+
+RM500Q is a 5G module from Quectel, supporting both standalone and
+non-standalone modes. Unlike other recent Quectel modems, it is possible
+to identify the diagnostic interface (bInterfaceProtocol is unique).
+Thus, there is no need to check for the number of endpoints or reserve
+interfaces. The interface number is still dynamic though, so matching on
+interface number is not possible and two entries have to be added to the
+table.
+
+Output from usb-devices with all interfaces enabled (order is diag,
+nmea, at_port, modem, rmnet and adb):
+
+Bus 004 Device 007: ID 2c7c:0800 Quectel Wireless Solutions Co., Ltd.
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               3.20
+  bDeviceClass            0 (Defined at Interface level)
+  bDeviceSubClass         0
+  bDeviceProtocol         0
+  bMaxPacketSize0         9
+  idVendor           0x2c7c Quectel Wireless Solutions Co., Ltd.
+  idProduct          0x0800
+  bcdDevice            4.14
+  iManufacturer           1 Quectel
+  iProduct                2 LTE-A Module
+  iSerial                 3 40046d60
+  bNumConfigurations      1
+  Configuration Descriptor:
+    bLength                 9
+    bDescriptorType         2
+    wTotalLength          328
+    bNumInterfaces          6
+    bConfigurationValue     1
+    iConfiguration          4 DIAG_SER_RMNET
+    bmAttributes         0xa0
+      (Bus Powered)
+      Remote Wakeup
+    MaxPower              224mA
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        0
+      bAlternateSetting       0
+      bNumEndpoints           2
+      bInterfaceClass       255 Vendor Specific Class
+      bInterfaceSubClass    255 Vendor Specific Subclass
+      bInterfaceProtocol     48
+      iInterface              0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0400  1x 1024 bytes
+        bInterval               0
+        bMaxBurst               0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x01  EP 1 OUT
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0400  1x 1024 bytes
+        bInterval               0
+        bMaxBurst               0
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       0
+      bNumEndpoints           3
+      bInterfaceClass       255 Vendor Specific Class
+      bInterfaceSubClass      0
+      bInterfaceProtocol      0
+      iInterface              0
+      ** UNRECOGNIZED:  05 24 00 10 01
+      ** UNRECOGNIZED:  05 24 01 00 00
+      ** UNRECOGNIZED:  04 24 02 02
+      ** UNRECOGNIZED:  05 24 06 00 00
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x000a  1x 10 bytes
+        bInterval               9
+        bMaxBurst               0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x82  EP 2 IN
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0400  1x 1024 bytes
+        bInterval               0
+        bMaxBurst               0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x02  EP 2 OUT
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0400  1x 1024 bytes
+        bInterval               0
+        bMaxBurst               0
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        2
+      bAlternateSetting       0
+      bNumEndpoints           3
+      bInterfaceClass       255 Vendor Specific Class
+      bInterfaceSubClass      0
+      bInterfaceProtocol      0
+      iInterface              0
+      ** UNRECOGNIZED:  05 24 00 10 01
+      ** UNRECOGNIZED:  05 24 01 00 00
+      ** UNRECOGNIZED:  04 24 02 02
+      ** UNRECOGNIZED:  05 24 06 00 00
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x85  EP 5 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x000a  1x 10 bytes
+        bInterval               9
+        bMaxBurst               0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x84  EP 4 IN
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0400  1x 1024 bytes
+        bInterval               0
+        bMaxBurst               0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x03  EP 3 OUT
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0400  1x 1024 bytes
+        bInterval               0
+        bMaxBurst               0
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        3
+      bAlternateSetting       0
+      bNumEndpoints           3
+      bInterfaceClass       255 Vendor Specific Class
+      bInterfaceSubClass      0
+      bInterfaceProtocol      0
+      iInterface              0
+      ** UNRECOGNIZED:  05 24 00 10 01
+      ** UNRECOGNIZED:  05 24 01 00 00
+      ** UNRECOGNIZED:  04 24 02 02
+      ** UNRECOGNIZED:  05 24 06 00 00
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x87  EP 7 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x000a  1x 10 bytes
+        bInterval               9
+        bMaxBurst               0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x86  EP 6 IN
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0400  1x 1024 bytes
+        bInterval               0
+        bMaxBurst               0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x04  EP 4 OUT
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0400  1x 1024 bytes
+        bInterval               0
+        bMaxBurst               0
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        4
+      bAlternateSetting       0
+      bNumEndpoints           3
+      bInterfaceClass       255 Vendor Specific Class
+      bInterfaceSubClass    255 Vendor Specific Subclass
+      bInterfaceProtocol    255 Vendor Specific Protocol
+      iInterface              5 CDEV Serial
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x88  EP 8 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0008  1x 8 bytes
+        bInterval               9
+        bMaxBurst               0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x8e  EP 14 IN
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0400  1x 1024 bytes
+        bInterval               0
+        bMaxBurst               6
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x0f  EP 15 OUT
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0400  1x 1024 bytes
+        bInterval               0
+        bMaxBurst               2
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        5
+      bAlternateSetting       0
+      bNumEndpoints           2
+      bInterfaceClass       255 Vendor Specific Class
+      bInterfaceSubClass     66
+      bInterfaceProtocol      1
+      iInterface              6 ADB Interface
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x05  EP 5 OUT
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0400  1x 1024 bytes
+        bInterval               0
+        bMaxBurst               0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x89  EP 9 IN
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0400  1x 1024 bytes
+        bInterval               0
+        bMaxBurst               0
+Binary Object Store Descriptor:
+  bLength                 5
+  bDescriptorType        15
+  wTotalLength           42
+  bNumDeviceCaps          3
+  USB 2.0 Extension Device Capability:
+    bLength                 7
+    bDescriptorType        16
+    bDevCapabilityType      2
+    bmAttributes   0x00000006
+      Link Power Management (LPM) Supported
+  SuperSpeed USB Device Capability:
+    bLength                10
+    bDescriptorType        16
+    bDevCapabilityType      3
+    bmAttributes         0x00
+    wSpeedsSupported   0x000f
+      Device can operate at Low Speed (1Mbps)
+      Device can operate at Full Speed (12Mbps)
+      Device can operate at High Speed (480Mbps)
+      Device can operate at SuperSpeed (5Gbps)
+    bFunctionalitySupport   1
+      Lowest fully-functional device speed is Full Speed (12Mbps)
+    bU1DevExitLat           1 micro seconds
+    bU2DevExitLat         500 micro seconds
+  ** UNRECOGNIZED:  14 10 0a 00 01 00 00 00 00 11 00 00 30 40 0a 00 b0 40 0a 00
+Device Status:     0x0000
+  (Bus Powered)
+
+Signed-off-by: Kristian Evensen &lt;kristian.evensen@gmail.com&gt;
+Cc: stable &lt;stable@vger.kernel.org&gt;
+Signed-off-by: Johan Hovold &lt;johan@kernel.org&gt;
+Signed-off-by: Greg Kroah-Hartman &lt;gregkh@linuxfoundation.org&gt;
+
+---
+ drivers/usb/serial/option.c |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+--- a/drivers/usb/serial/option.c
++++ b/drivers/usb/serial/option.c
+@@ -248,6 +248,7 @@ static void option_instat_callback(struc
+ #define QUECTEL_PRODUCT_BG96			0x0296
+ #define QUECTEL_PRODUCT_EP06			0x0306
+ #define QUECTEL_PRODUCT_EM12			0x0512
++#define QUECTEL_PRODUCT_RM500Q			0x0800
+ 
+ #define CMOTECH_VENDOR_ID			0x16d8
+ #define CMOTECH_PRODUCT_6001			0x6001
+@@ -1104,6 +1105,9 @@ static const struct usb_device_id option
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EM12, 0xff, 0xff, 0xff),
+ 	  .driver_info = RSVD(1) | RSVD(2) | RSVD(3) | RSVD(4) | NUMEP2 },
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_EM12, 0xff, 0, 0) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_RM500Q, 0xff, 0xff, 0x30) },
++	{ USB_DEVICE_AND_INTERFACE_INFO(QUECTEL_VENDOR_ID, QUECTEL_PRODUCT_RM500Q, 0xff, 0, 0) },
++
+ 	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_6001) },
+ 	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_CMU_300) },
+ 	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_6003),
+
+
+</pre><hr><pre><a
+href="../20200122092836.784725349@linuxfoundation.org/"
+rel=next>next</a> <a
+href="../20200122092836.633634805@linuxfoundation.org/"
+rel=prev>prev</a> <a
+href="../20200122092833.339495161@linuxfoundation.org/">parent</a> <a
+href="#R">reply</a>	other threads:[<a
+href="../?t=20200122133155">~2020-01-22 13:31 UTC</a>|<a
+href="../">newest</a>]
+
+<b>Thread overview: </b>238+ messages / expand[<a
+href="T/#u">flat</a>|<a
+href="t/#u">nested</a>]  <a
+href="t.mbox.gz">mbox.gz</a>  <a
+href="t.atom">Atom feed</a>  <a
+href="#b">top</a>
+2020-01-22  9:26 <a
+href="../20200122092833.339495161@linuxfoundation.org/">[PATCH 5.4 000/222] 5.4.14-stable review</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092833.441430663@linuxfoundation.org/">[PATCH 5.4 001/222] ARM: dts: meson8: fix the size of the PMU registers</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092833.515642549@linuxfoundation.org/">[PATCH 5.4 002/222] clk: qcom: gcc-sdm845: Add missing flag to votable GDSCs</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092833.584400329@linuxfoundation.org/">[PATCH 5.4 003/222] soc: amlogic: meson-ee-pwrc: propagate PD provider registration errors</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092833.660823033@linuxfoundation.org/">[PATCH 5.4 004/222] soc: amlogic: meson-ee-pwrc: propagate errors from pm_genpd_init()</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092833.739396355@linuxfoundation.org/">[PATCH 5.4 005/222] dt-bindings: reset: meson8b: fix duplicate reset IDs</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092833.811172521@linuxfoundation.org/">[PATCH 5.4 006/222] ARM: dts: imx6q-dhcom: fix rtc compatible</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092833.889112687@linuxfoundation.org/">[PATCH 5.4 007/222] arm64: dts: ls1028a: fix endian setting for dcfg</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092833.958795642@linuxfoundation.org/">[PATCH 5.4 008/222] arm64: dts: imx8mm: Change SDMA1 ahb clock for imx8mm</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092834.033352861@linuxfoundation.org/">[PATCH 5.4 009/222] bus: ti-sysc: Fix iterating over clocks</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092834.104910280@linuxfoundation.org/">[PATCH 5.4 010/222] clk: Dont try to enable critical clocks if prepare failed</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092834.177947435@linuxfoundation.org/">[PATCH 5.4 011/222] Revert &#34;gpio: thunderx: Switch to GPIOLIB_IRQCHIP&#34;</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092834.255279802@linuxfoundation.org/">[PATCH 5.4 012/222] arm64: dts: imx8mq-librem5-devkit: use correct interrupt for the magnetometer</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092834.328837212@linuxfoundation.org/">[PATCH 5.4 013/222] ASoC: msm8916-wcd-digital: Reset RX interpolation path after use</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092834.402474044@linuxfoundation.org/">[PATCH 5.4 014/222] ASoC: stm32: sai: fix possible circular locking</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092834.475977861@linuxfoundation.org/">[PATCH 5.4 015/222] ASoC: stm32: dfsdm: fix 16 bits record</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092834.550163981@linuxfoundation.org/">[PATCH 5.4 016/222] ASoC: msm8916-wcd-analog: Fix selected events for MIC BIAS External1</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092834.624598744@linuxfoundation.org/">[PATCH 5.4 017/222] ASoC: msm8916-wcd-analog: Fix MIC BIAS Internal1</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092834.698926029@linuxfoundation.org/">[PATCH 5.4 018/222] ARM: OMAP2+: Fix ti_sysc_find_one_clockdomain to check for to_clk_hw_omap</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092834.776704477@linuxfoundation.org/">[PATCH 5.4 019/222] ARM: dts: imx7ulp: fix reg of cpu node</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092834.849596981@linuxfoundation.org/">[PATCH 5.4 020/222] ARM: dts: imx6q-dhcom: Fix SGTL5000 VDDIO regulator connection</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092834.924493921@linuxfoundation.org/">[PATCH 5.4 021/222] ASoC: Intel: bytcht_es8316: Fix Irbis NB41 netbook quirk</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092834.998090886@linuxfoundation.org/">[PATCH 5.4 022/222] ALSA: dice: fix fallback from protocol extension into limited functionality</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092835.077795996@linuxfoundation.org/">[PATCH 5.4 023/222] ALSA: seq: Fix racy access for queue timer in proc read</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092835.155860714@linuxfoundation.org/">[PATCH 5.4 024/222] ALSA: firewire-tascam: fix corruption due to spin lock without restoration in SoftIRQ context</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092835.230210629@linuxfoundation.org/">[PATCH 5.4 025/222] ALSA: usb-audio: fix sync-ep altsetting sanity check</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092835.307607458@linuxfoundation.org/">[PATCH 5.4 026/222] arm64: dts: allwinner: a64: olinuxino: Fix SDIO supply regulator</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092835.388834257@linuxfoundation.org/">[PATCH 5.4 027/222] arm64: dts: allwinner: a64: olinuxino: Fix eMMC</a> &#34; Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092835.470566254@linuxfoundation.org/">[PATCH 5.4 028/222] arm64: dts: agilex/stratix10: fix pmu interrupt numbers</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092835.547224718@linuxfoundation.org/">[PATCH 5.4 029/222] Fix built-in early-load Intel microcode alignment</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092835.626065575@linuxfoundation.org/">[PATCH 5.4 030/222] clk: sunxi-ng: r40: Allow setting parent rate for external clock outputs</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092835.700575757@linuxfoundation.org/">[PATCH 5.4 031/222] block: fix an integer overflow in logical block size</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092835.775601334@linuxfoundation.org/">[PATCH 5.4 032/222] fuse: fix fuse_send_readpages() in the syncronous read case</a> Greg Kroah-Hartman
+2020-01-22  9:26 ` <a
+href="../20200122092835.852416399@linuxfoundation.org/">[PATCH 5.4 033/222] io_uring: only allow submit from owning task</a> Greg Kroah-Hartman
+2020-01-24 10:38   ` <a
+href="../1b4a79c1-6cda-12a8-219b-0c1c146faeff@samba.org/">Stefan Metzmacher</a>
+2020-01-24 10:41     ` <a
+href="../c7fd4357-79b8-60a9-14cf-31ec07a1153d@samba.org/">Stefan Metzmacher</a>
+2020-01-24 16:58     ` <a
+href="../b8fd1a53-8f75-e9cd-9df5-a79541b9fa14@kernel.dk/">Jens Axboe</a>
+2020-01-24 19:11       ` <a
+href="../cc42cd7c-0d22-74e2-5163-17310466f9b1@samba.org/">Stefan Metzmacher</a>
+2020-01-24 21:41         ` <a
+href="../70b6d983-0883-5462-45a4-2305cb92cf88@kernel.dk/">Jens Axboe</a>
+2020-01-26  5:54     ` <a
+href="../20200126055457.5w4f5jyhkic7cixu@alap3.anarazel.de/">Andres Freund</a>
+2020-01-26 16:57       ` <a
+href="../c52a3b63-731b-95f2-ae97-0ad153e7698b@kernel.dk/">Jens Axboe</a>
+2020-01-22  9:27 ` <a
+href="../20200122092835.929918908@linuxfoundation.org/">[PATCH 5.4 034/222] cpuidle: teo: Fix intervals[] array indexing bug</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092836.007162481@linuxfoundation.org/">[PATCH 5.4 035/222] ARM: dts: am571x-idk: Fix gpios property to have the correct gpio number</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092836.090826916@linuxfoundation.org/">[PATCH 5.4 036/222] ARM: davinci: select CONFIG_RESET_CONTROLLER</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092836.175504422@linuxfoundation.org/">[PATCH 5.4 037/222] perf: Correctly handle failed perf_get_aux_event()</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092836.253449337@linuxfoundation.org/">[PATCH 5.4 038/222] iio: adc: ad7124: Fix DT channel configuration</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092836.329332842@linuxfoundation.org/">[PATCH 5.4 039/222] iio: imu: st_lsm6dsx: Fix selection of ST_LSM6DS3_ID</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092836.405074922@linuxfoundation.org/">[PATCH 5.4 040/222] iio: light: vcnl4000: Fix scale for vcnl4040</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092836.481202605@linuxfoundation.org/">[PATCH 5.4 041/222] iio: chemical: pms7003: fix unmet triggered buffer dependency</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092836.558100671@linuxfoundation.org/">[PATCH 5.4 042/222] iio: buffer: align the size of scan bytes to size of the largest element</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092836.633634805@linuxfoundation.org/">[PATCH 5.4 043/222] USB: serial: simple: Add Motorola Solutions TETRA MTP3xxx and MTP85xx</a> Greg Kroah-Hartman
+<b>2020-01-22  9:27 ` <a
+id=r
+href="#t">Greg Kroah-Hartman [this message]</a></b>
+2020-01-22  9:27 ` <a
+href="../20200122092836.784725349@linuxfoundation.org/">[PATCH 5.4 045/222] USB: serial: opticon: fix control-message timeouts</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092836.857435691@linuxfoundation.org/">[PATCH 5.4 046/222] USB: serial: option: add support for Quectel RM500Q in QDL mode</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092836.952451015@linuxfoundation.org/">[PATCH 5.4 047/222] USB: serial: suppress driver bind attributes</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092837.028566412@linuxfoundation.org/">[PATCH 5.4 048/222] USB: serial: ch341: handle unbound port at reset_resume</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092837.111988670@linuxfoundation.org/">[PATCH 5.4 049/222] USB: serial: io_edgeport: handle unbound ports on URB completion</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092837.188355759@linuxfoundation.org/">[PATCH 5.4 050/222] USB: serial: io_edgeport: add missing active-port sanity check</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092837.265058198@linuxfoundation.org/">[PATCH 5.4 051/222] USB: serial: keyspan: handle unbound ports</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092837.340138921@linuxfoundation.org/">[PATCH 5.4 052/222] USB: serial: quatech2:</a> &#34; Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092837.416673594@linuxfoundation.org/">[PATCH 5.4 053/222] staging: comedi: ni_routes: fix null dereference in ni_find_route_source()</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092837.502758644@linuxfoundation.org/">[PATCH 5.4 054/222] staging: comedi: ni_routes: allow partial routing information</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092837.588744767@linuxfoundation.org/">[PATCH 5.4 055/222] scsi: fnic: fix invalid stack access</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092837.689793034@linuxfoundation.org/">[PATCH 5.4 056/222] scsi: mptfusion: Fix double fetch bug in ioctl</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092837.771519475@linuxfoundation.org/">[PATCH 5.4 057/222] ptrace: reintroduce usage of subjective credentials in ptrace_has_cap()</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092837.865067935@linuxfoundation.org/">[PATCH 5.4 058/222] mtd: rawnand: gpmi: Fix suspend/resume problem</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092837.940724471@linuxfoundation.org/">[PATCH 5.4 059/222] mtd: rawnand: gpmi: Restore nfc timing setup after suspend/resume</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092838.013538193@linuxfoundation.org/">[PATCH 5.4 060/222] usb: core: hub: Improved device recognition on remote wakeup</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092838.087110567@linuxfoundation.org/">[PATCH 5.4 061/222] cpu/SMT: Fix x86 link error without CONFIG_SYSFS</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092838.159130044@linuxfoundation.org/">[PATCH 5.4 062/222] x86/resctrl: Fix an imbalance in domain_remove_cpu()</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092838.232080512@linuxfoundation.org/">[PATCH 5.4 063/222] x86/CPU/AMD: Ensure clearing of SME/SEV features is maintained</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092838.302318765@linuxfoundation.org/">[PATCH 5.4 064/222] locking/rwsem: Fix kernel crash when spinning on RWSEM_OWNER_UNKNOWN</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092838.375669008@linuxfoundation.org/">[PATCH 5.4 065/222] perf/x86/intel/uncore: Fix missing marker for snr_uncore_imc_freerunning_events</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092838.449657394@linuxfoundation.org/">[PATCH 5.4 066/222] x86/efistub: Disable paging at mixed mode entry</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092838.523158685@linuxfoundation.org/">[PATCH 5.4 067/222] s390/zcrypt: Fix CCA cipher key gen with clear key value function</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092838.593531809@linuxfoundation.org/">[PATCH 5.4 068/222] scsi: storvsc: Correctly set number of hardware queues for IDE disk</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092838.664472744@linuxfoundation.org/">[PATCH 5.4 069/222] mtd: spi-nor: Fix selection of 4-byte addressing opcodes on Spansion</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092838.734177378@linuxfoundation.org/">[PATCH 5.4 070/222] drm/i915: Add missing include file &lt;linux/math64.h&gt;</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092838.804074617@linuxfoundation.org/">[PATCH 5.4 071/222] x86/resctrl: Fix potential memory leak</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092838.874517870@linuxfoundation.org/">[PATCH 5.4 072/222] efi/earlycon: Fix write-combine mapping on x86</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092838.945601820@linuxfoundation.org/">[PATCH 5.4 073/222] s390/setup: Fix secure ipl message</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092839.017829447@linuxfoundation.org/">[PATCH 5.4 074/222] clk: samsung: exynos5420: Keep top G3D clocks enabled</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092839.088051491@linuxfoundation.org/">[PATCH 5.4 075/222] perf hists: Fix variable names inconsistency in hists__for_each() macro</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092839.158437396@linuxfoundation.org/">[PATCH 5.4 076/222] locking/lockdep: Fix buffer overrun problem in stack_trace[]</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092839.228537744@linuxfoundation.org/">[PATCH 5.4 077/222] perf report: Fix incorrectly added dimensions as switch perf data file</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092839.299021330@linuxfoundation.org/">[PATCH 5.4 078/222] mm/shmem.c: thp, shmem: fix conflict of above-47bit hint address and PMD alignment</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092839.369227278@linuxfoundation.org/">[PATCH 5.4 079/222] mm/huge_memory.c: thp:</a> &#34; Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092839.440399005@linuxfoundation.org/">[PATCH 5.4 080/222] mm: memcg/slab: fix percpu slab vmstats flushing</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092839.510902160@linuxfoundation.org/">[PATCH 5.4 081/222] mm: memcg/slab: call flush_memcg_workqueue() only if memcg workqueue is valid</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092839.582654920@linuxfoundation.org/">[PATCH 5.4 082/222] mm, debug_pagealloc: dont rely on static keys too early</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092839.655192369@linuxfoundation.org/">[PATCH 5.4 083/222] btrfs: rework arguments of btrfs_unlink_subvol</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092839.725614756@linuxfoundation.org/">[PATCH 5.4 084/222] btrfs: fix invalid removal of root ref</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092839.796601078@linuxfoundation.org/">[PATCH 5.4 085/222] btrfs: do not delete mismatched root refs</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092839.869369609@linuxfoundation.org/">[PATCH 5.4 086/222] btrfs: relocation: fix reloc_root lifespan and access</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092839.946009315@linuxfoundation.org/">[PATCH 5.4 087/222] btrfs: fix memory leak in qgroup accounting</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092840.022686074@linuxfoundation.org/">[PATCH 5.4 088/222] btrfs: check rw_devices, not num_devices for balance</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092840.100648986@linuxfoundation.org/">[PATCH 5.4 089/222] Btrfs: always copy scrub arguments back to user space</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092840.175336528@linuxfoundation.org/">[PATCH 5.4 090/222] mm/memory_hotplug: dont free usage map when removing a re-added early section</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092840.249902197@linuxfoundation.org/">[PATCH 5.4 091/222] mm/page-writeback.c: avoid potential division by zero in wb_min_max_ratio()</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092840.322914725@linuxfoundation.org/">[PATCH 5.4 092/222] mm: khugepaged: add trace status description for SCAN_PAGE_HAS_PRIVATE</a> Greg Kroah-Hartman
+2020-01-22  9:27 ` <a
+href="../20200122092840.396293510@linuxfoundation.org/">[PATCH 5.4 093/222] ARM: dts: imx6qdl-sabresd: Remove incorrect power supply assignment</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092840.468938013@linuxfoundation.org/">[PATCH 5.4 094/222] ARM: dts: imx6sx-sdb:</a> &#34; Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092840.541921944@linuxfoundation.org/">[PATCH 5.4 095/222] ARM: dts: imx6sl-evk:</a> &#34; Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092840.615035986@linuxfoundation.org/">[PATCH 5.4 096/222] ARM: dts: imx6sll-evk:</a> &#34; Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092840.687283808@linuxfoundation.org/">[PATCH 5.4 097/222] ARM: dts: imx6q-icore-mipi: Use 1.5 version of i.Core MX6DL</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092840.757722524@linuxfoundation.org/">[PATCH 5.4 098/222] ARM: dts: imx7: Fix Toradex Colibri iMX7S 256MB NAND flash support</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092840.827601529@linuxfoundation.org/">[PATCH 5.4 099/222] net: stmmac: 16KB buffer must be 16 byte aligned</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092840.900104446@linuxfoundation.org/">[PATCH 5.4 100/222] net: stmmac: Enable 16KB buffer size</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092840.971841376@linuxfoundation.org/">[PATCH 5.4 101/222] reset: Fix {of,devm}_reset_control_array_get kerneldoc return types</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092841.046200497@linuxfoundation.org/">[PATCH 5.4 102/222] tipc: fix potential hanging after b/rcast changing</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092841.116433294@linuxfoundation.org/">[PATCH 5.4 103/222] tipc: fix retrans failure due to wrong destination</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092841.186379638@linuxfoundation.org/">[PATCH 5.4 104/222] net: fix kernel-doc warning in &lt;linux/netdevice.h&gt;</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092841.257085936@linuxfoundation.org/">[PATCH 5.4 105/222] block: Fix the type of sts in bsg_queue_rq()</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092841.327644984@linuxfoundation.org/">[PATCH 5.4 106/222] drm/amd/display: Reorder detect_edp_sink_caps before link settings read</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092841.397679069@linuxfoundation.org/">[PATCH 5.4 107/222] bpf: Fix incorrect verifier simulation of ARSH under ALU32</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092841.469023967@linuxfoundation.org/">[PATCH 5.4 108/222] bpf: Sockmap/tls, during free we may call tcp_bpf_unhash() in loop</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092841.539726799@linuxfoundation.org/">[PATCH 5.4 109/222] bpf: Sockmap, ensure sock lock held during tear down</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092841.611847883@linuxfoundation.org/">[PATCH 5.4 110/222] bpf: Sockmap/tls, push write_space updates through ulp updates</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092841.682573648@linuxfoundation.org/">[PATCH 5.4 111/222] bpf: Sockmap, skmsg helper overestimates push, pull, and pop bounds</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092841.753381385@linuxfoundation.org/">[PATCH 5.4 112/222] bpf: Sockmap/tls, msg_push_data may leave end mark in place</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092841.824015725@linuxfoundation.org/">[PATCH 5.4 113/222] bpf: Sockmap/tls, tls_sw can create a plaintext buf &gt; encrypt buf</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092841.894240359@linuxfoundation.org/">[PATCH 5.4 114/222] bpf: Sockmap/tls, skmsg can have wrapped skmsg that needs extra chaining</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092841.966043129@linuxfoundation.org/">[PATCH 5.4 115/222] bpf: Sockmap/tls, fix pop data with SK_DROP return code</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092842.038196458@linuxfoundation.org/">[PATCH 5.4 116/222] i2c: tegra: Fix suspending in active runtime PM state</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092842.109113952@linuxfoundation.org/">[PATCH 5.4 117/222] i2c: tegra: Properly disable runtime PM on drivers probe error</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092842.189163287@linuxfoundation.org/">[PATCH 5.4 118/222] cfg80211: fix deadlocks in autodisconnect work</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092842.260670992@linuxfoundation.org/">[PATCH 5.4 119/222] cfg80211: fix memory leak in nl80211_probe_mesh_link</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092842.331958509@linuxfoundation.org/">[PATCH 5.4 120/222] cfg80211: fix memory leak in cfg80211_cqm_rssi_update</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092842.401964700@linuxfoundation.org/">[PATCH 5.4 121/222] cfg80211: fix page refcount issue in A-MSDU decap</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092842.486164236@linuxfoundation.org/">[PATCH 5.4 122/222] bpf/sockmap: Read psock ingress_msg before sk_receive_queue</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092842.556199913@linuxfoundation.org/">[PATCH 5.4 123/222] i2c: iop3xx: Fix memory leak in probe error path</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092842.631271349@linuxfoundation.org/">[PATCH 5.4 124/222] netfilter: fix a use-after-free in mtype_destroy()</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092842.701677221@linuxfoundation.org/">[PATCH 5.4 125/222] netfilter: arp_tables: init netns pointer in xt_tgdtor_param struct</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092842.772441253@linuxfoundation.org/">[PATCH 5.4 126/222] netfilter: nat: fix ICMP header corruption on ICMP errors</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092842.844012730@linuxfoundation.org/">[PATCH 5.4 127/222] netfilter: nft_tunnel: fix null-attribute check</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092842.914363198@linuxfoundation.org/">[PATCH 5.4 128/222] netfilter: nft_tunnel: ERSPAN_VERSION must not be null</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092842.985072809@linuxfoundation.org/">[PATCH 5.4 129/222] netfilter: nf_tables: remove WARN and add NLA_STRING upper limits</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092843.056679889@linuxfoundation.org/">[PATCH 5.4 130/222] netfilter: nf_tables: store transaction list locally while requesting module</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092843.127326322@linuxfoundation.org/">[PATCH 5.4 131/222] netfilter: nf_tables: fix flowtable list del corruption</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092843.197411658@linuxfoundation.org/">[PATCH 5.4 132/222] NFC: pn533: fix bulk-message timeout</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092843.267838496@linuxfoundation.org/">[PATCH 5.4 133/222] net: bpf: Dont leak time wait and request sockets</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092843.337350817@linuxfoundation.org/">[PATCH 5.4 134/222] bpftool: Fix printing incorrect pointer in btf_dump_ptr</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092843.407940112@linuxfoundation.org/">[PATCH 5.4 135/222] batman-adv: Fix DAT candidate selection on little endian systems</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092843.478479187@linuxfoundation.org/">[PATCH 5.4 136/222] macvlan: use skb_reset_mac_header() in macvlan_queue_xmit()</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092843.549078478@linuxfoundation.org/">[PATCH 5.4 137/222] hv_netvsc: Fix memory leak when removing rndis device</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092843.619836106@linuxfoundation.org/">[PATCH 5.4 138/222] net: avoid updating qdisc_xmit_lock_key in netdev_update_lockdep_key()</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092843.689580438@linuxfoundation.org/">[PATCH 5.4 139/222] net: dsa: tag_qca: fix doubled Tx statistics</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092843.758942348@linuxfoundation.org/">[PATCH 5.4 140/222] net: hns3: pad the short frame before sending to the hardware</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092843.829070021@linuxfoundation.org/">[PATCH 5.4 141/222] net: hns: fix soft lockup when there is not enough memory</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092843.900371168@linuxfoundation.org/">[PATCH 5.4 142/222] net: phy: dp83867: Set FORCE_LINK_GOOD to default after reset</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092843.970302408@linuxfoundation.org/">[PATCH 5.4 143/222] net/sched: act_ife: initalize ife-&gt;metalist earlier</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092844.041982912@linuxfoundation.org/">[PATCH 5.4 144/222] net: usb: lan78xx: limit size of local TSO packets</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092844.113309872@linuxfoundation.org/">[PATCH 5.4 145/222] net/wan/fsl_ucc_hdlc: fix out of bounds write on array utdm_info</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092844.183839189@linuxfoundation.org/">[PATCH 5.4 146/222] ptp: free ptp device pin descriptors properly</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092844.254085651@linuxfoundation.org/">[PATCH 5.4 147/222] r8152: add missing endpoint sanity check</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092844.324091937@linuxfoundation.org/">[PATCH 5.4 148/222] tcp: fix marked lost packets not being retransmitted</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092844.394182716@linuxfoundation.org/">[PATCH 5.4 149/222] bnxt_en: Fix NTUPLE firmware command failures</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092844.466699313@linuxfoundation.org/">[PATCH 5.4 150/222] bnxt_en: Fix ipv6 RFS filter matching logic</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092844.536923917@linuxfoundation.org/">[PATCH 5.4 151/222] bnxt_en: Do not treat DSN (Digital Serial Number) read failure as fatal</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092844.606889750@linuxfoundation.org/">[PATCH 5.4 152/222] net: ethernet: ave: Avoid lockdep warning</a> Greg Kroah-Hartman
+2020-01-22  9:28 ` <a
+href="../20200122092844.677212804@linuxfoundation.org/">[PATCH 5.4 153/222] net: systemport: Fixed queue mapping in internal ring map</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092844.746801953@linuxfoundation.org/">[PATCH 5.4 154/222] net: dsa: sja1105: Dont error out on disabled ports with no phy-mode</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092844.817186226@linuxfoundation.org/">[PATCH 5.4 155/222] net: dsa: tag_gswip: fix typo in tagger name</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092844.887337125@linuxfoundation.org/">[PATCH 5.4 156/222] net: sched: act_ctinfo: fix memory leak</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092844.958382160@linuxfoundation.org/">[PATCH 5.4 157/222] net: dsa: bcm_sf2: Configure IMP port for 2Gb/sec</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092845.031107875@linuxfoundation.org/">[PATCH 5.4 158/222] i40e: prevent memory leak in i40e_setup_macvlans</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092845.101869349@linuxfoundation.org/">[PATCH 5.4 159/222] drm/amdgpu: allow direct upload save restore list for raven2</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092845.171712966@linuxfoundation.org/">[PATCH 5.4 160/222] sh_eth: check sh_eth_cpu_data::dual_port when dumping registers</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092845.242283226@linuxfoundation.org/">[PATCH 5.4 161/222] mlxsw: spectrum: Do not modify cloned SKBs during xmit</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092845.313521947@linuxfoundation.org/">[PATCH 5.4 162/222] mlxsw: spectrum: Wipe xstats.backlog of down ports</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092845.384279560@linuxfoundation.org/">[PATCH 5.4 163/222] mlxsw: spectrum_qdisc: Include MC TCs in Qdisc counters</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092845.456111419@linuxfoundation.org/">[PATCH 5.4 164/222] net: stmmac: selftests: Make it work in Synopsys AXS101 boards</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092845.527092902@linuxfoundation.org/">[PATCH 5.4 165/222] net: stmmac: selftests: Mark as fail when received VLAN ID != expected</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092845.597727250@linuxfoundation.org/">[PATCH 5.4 166/222] selftests: mlxsw: qos_mc_aware: Fix mausezahn invocation</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092845.668971634@linuxfoundation.org/">[PATCH 5.4 167/222] net: stmmac: selftests: Update status when disabling RSS</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092845.739671803@linuxfoundation.org/">[PATCH 5.4 168/222] net: stmmac: tc: Do not setup flower filtering if RSS is enabled</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092845.809734481@linuxfoundation.org/">[PATCH 5.4 169/222] devlink: Wait longer before warning about unset port type</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092845.880318995@linuxfoundation.org/">[PATCH 5.4 170/222] xen/blkfront: Adjust indentation in xlvbd_alloc_gendisk</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092845.950277758@linuxfoundation.org/">[PATCH 5.4 171/222] dt-bindings: Add missing properties keyword enclosing snps,tso</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092846.021033976@linuxfoundation.org/">[PATCH 5.4 172/222] tcp: refine rule to allow EPOLLOUT generation under mem pressure</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092846.091001474@linuxfoundation.org/">[PATCH 5.4 173/222] irqchip: Place CONFIG_SIFIVE_PLIC into the menu</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092846.161440544@linuxfoundation.org/">[PATCH 5.4 174/222] arm64: dts: qcom: msm8998: Disable coresight by default</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092846.230821180@linuxfoundation.org/">[PATCH 5.4 175/222] cw1200: Fix a signedness bug in cw1200_load_firmware()</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092846.300974685@linuxfoundation.org/">[PATCH 5.4 176/222] arm64: dts: meson: axg: fix audio fifo reg size</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092846.371589826@linuxfoundation.org/">[PATCH 5.4 177/222] arm64: dts: meson: g12:</a> &#34; Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092846.441350088@linuxfoundation.org/">[PATCH 5.4 178/222] arm64: dts: meson-gxl-s905x-khadas-vim: fix gpio-keys-polled node</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092846.509666279@linuxfoundation.org/">[PATCH 5.4 179/222] arm64: dts: renesas: r8a77970: Fix PWM3</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092846.580105305@linuxfoundation.org/">[PATCH 5.4 180/222] arm64: dts: marvell: Add AP806-dual missing CPU clocks</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092846.650947415@linuxfoundation.org/">[PATCH 5.4 181/222] cfg80211: check for set_wiphy_params</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092846.721249661@linuxfoundation.org/">[PATCH 5.4 182/222] tick/sched: Annotate lockless access to last_jiffies_update</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092846.791206349@linuxfoundation.org/">[PATCH 5.4 183/222] arm64: dts: marvell: Fix CP110 NAND controller node multi-line comment alignment</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092846.861792313@linuxfoundation.org/">[PATCH 5.4 184/222] arm64: dts: renesas: r8a774a1: Remove audio port node</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092846.933959096@linuxfoundation.org/">[PATCH 5.4 185/222] arm64: dts: imx8mm-evk: Assigned clocks for audio plls</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092847.005621971@linuxfoundation.org/">[PATCH 5.4 186/222] arm64: dts: qcom: sdm845-cheza: delete zap-shader</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092847.076128270@linuxfoundation.org/">[PATCH 5.4 187/222] ARM: dts: imx6ul-kontron-n6310-s: Disable the snvs-poweroff driver</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092847.146268171@linuxfoundation.org/">[PATCH 5.4 188/222] arm64: dts: allwinner: a64: Re-add PMU node</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092847.214902689@linuxfoundation.org/">[PATCH 5.4 189/222] ARM: dts: dra7: fix cpsw mdio fck clock</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092847.285024823@linuxfoundation.org/">[PATCH 5.4 190/222] arm64: dts: juno: Fix UART frequency</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092847.355229972@linuxfoundation.org/">[PATCH 5.4 191/222] ARM: dts: Fix sgx sysconfig register for omap4</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092847.424461279@linuxfoundation.org/">[PATCH 5.4 192/222] Revert &#34;arm64: dts: juno: add dma-ranges property&#34;</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092847.495536388@linuxfoundation.org/">[PATCH 5.4 193/222] mtd: devices: fix mchp23k256 read and write</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092847.592021002@linuxfoundation.org/">[PATCH 5.4 194/222] mtd: cfi_cmdset_0002: only check errors when ready in cfi_check_err_status()</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092847.677954139@linuxfoundation.org/">[PATCH 5.4 195/222] mtd: cfi_cmdset_0002: fix delayed error detection on HyperFlash</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092847.746688593@linuxfoundation.org/">[PATCH 5.4 196/222] um: Dont trace irqflags during shutdown</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092847.815724717@linuxfoundation.org/">[PATCH 5.4 197/222] um: virtio_uml: Disallow modular build</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092847.885279414@linuxfoundation.org/">[PATCH 5.4 198/222] reiserfs: fix handling of -EOPNOTSUPP in reiserfs_for_each_xattr</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092847.956034483@linuxfoundation.org/">[PATCH 5.4 199/222] scsi: esas2r: unlock on error in esas2r_nvram_read_direct()</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092848.027188408@linuxfoundation.org/">[PATCH 5.4 200/222] scsi: hisi_sas: Dont create debugfs dump folder twice</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092848.097671225@linuxfoundation.org/">[PATCH 5.4 201/222] scsi: hisi_sas: Set the BIST init value before enabling BIST</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092848.168309729@linuxfoundation.org/">[PATCH 5.4 202/222] scsi: qla4xxx: fix double free bug</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092848.238314727@linuxfoundation.org/">[PATCH 5.4 203/222] scsi: bnx2i: fix potential use after free</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092848.308412177@linuxfoundation.org/">[PATCH 5.4 204/222] scsi: target: core: Fix a pr_debug() argument</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092848.379097881@linuxfoundation.org/">[PATCH 5.4 205/222] scsi: lpfc: fix: Coverity: lpfc_get_scsi_buf_s3(): Null pointer dereferences</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092848.450149077@linuxfoundation.org/">[PATCH 5.4 206/222] scsi: hisi_sas: Return directly if init hardware failed</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092848.520088601@linuxfoundation.org/">[PATCH 5.4 207/222] scsi: scsi_transport_sas: Fix memory leak when removing devices</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092848.590628821@linuxfoundation.org/">[PATCH 5.4 208/222] scsi: qla2xxx: Fix qla2x00_request_irqs() for MSI</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092848.661376864@linuxfoundation.org/">[PATCH 5.4 209/222] scsi: qla2xxx: fix rports not being mark as lost in sync fabric scan</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092848.732269702@linuxfoundation.org/">[PATCH 5.4 210/222] scsi: core: scsi_trace: Use get_unaligned_be*()</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092848.803750833@linuxfoundation.org/">[PATCH 5.4 211/222] scsi: lpfc: Fix list corruption detected in lpfc_put_sgl_per_hdwq</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092848.874374835@linuxfoundation.org/">[PATCH 5.4 212/222] scsi: lpfc: Fix hdwq sgl locks and irq handling</a> Greg Kroah-Hartman
+2020-01-22  9:29 ` <a
+href="../20200122092848.944976380@linuxfoundation.org/">[PATCH 5.4 213/222] scsi: lpfc: Fix a kernel warning triggered by lpfc_get_sgl_per_hdwq()</a> Greg Kroah-Hartman
+2020-01-22  9:30 ` <a
+href="../20200122092849.017723181@linuxfoundation.org/">[PATCH 5.4 214/222] rtw88: fix potential read outside array boundary</a> Greg Kroah-Hartman
+2020-01-22  9:30 ` <a
+href="../20200122092849.088567780@linuxfoundation.org/">[PATCH 5.4 215/222] perf probe: Fix wrong address verification</a> Greg Kroah-Hartman
+2020-01-22  9:30 ` <a
+href="../20200122092849.159018562@linuxfoundation.org/">[PATCH 5.4 216/222] perf script: Allow --time with --reltime</a> Greg Kroah-Hartman
+2020-01-22  9:30 ` <a
+href="../20200122092849.228738922@linuxfoundation.org/">[PATCH 5.4 217/222] clk: sprd: Use IS_ERR() to validate the return value of syscon_regmap_lookup_by_phandle()</a> Greg Kroah-Hartman
+2020-01-22  9:30 ` <a
+href="../20200122092849.299408794@linuxfoundation.org/">[PATCH 5.4 218/222] clk: imx7ulp: Correct system clock source option #7</a> Greg Kroah-Hartman
+2020-01-22  9:30 ` <a
+href="../20200122092849.369812737@linuxfoundation.org/">[PATCH 5.4 219/222] clk: imx7ulp: Correct DDR clock mux options</a> Greg Kroah-Hartman
+2020-01-22  9:30 ` <a
+href="../20200122092849.437883897@linuxfoundation.org/">[PATCH 5.4 220/222] regulator: ab8500: Remove SYSCLKREQ from enum ab8505_regulator_id</a> Greg Kroah-Hartman
+2020-01-22  9:30 ` <a
+href="../20200122092849.507081748@linuxfoundation.org/">[PATCH 5.4 221/222] hwmon: (pmbus/ibm-cffps) Switch LEDs to blocking brightness call</a> Greg Kroah-Hartman
+2020-01-22  9:30 ` <a
+href="../20200122092849.577706593@linuxfoundation.org/">[PATCH 5.4 222/222] hwmon: (pmbus/ibm-cffps) Fix LED blink behavior</a> Greg Kroah-Hartman
+2020-01-22 14:58 ` <a
+href="../012c6d63-a4cb-ead4-1a7e-d5727426200d@nvidia.com/">[PATCH 5.4 000/222] 5.4.14-stable review</a> Jon Hunter
+2020-01-22 15:02   ` <a
+href="../20200122150226.GA61380@kroah.com/">Greg Kroah-Hartman</a>
+2020-01-22 18:09 ` <a
+href="../CA+G9fYuFsU+3V_3wKdkfNEr=LB+QsPv6WCzFVfbi6gHR5T=vmQ@mail.gmail.com/">Naresh Kamboju</a>
+2020-01-23  6:44   ` <a
+href="../20200123064454.GD124954@kroah.com/">Greg Kroah-Hartman</a>
+2020-01-22 19:00 ` <a
+href="../20200122190052.GE20093@roeck-us.net/">Guenter Roeck</a>
+2020-01-23  6:44   ` <a
+href="../20200123064429.GC124954@kroah.com/">Greg Kroah-Hartman</a>
+2020-01-22 20:51 ` <a
+href="../d1a53f66-136e-f1c8-34d4-9ead26cff0b7@kernel.org/">shuah</a>
+2020-01-23  6:44   ` <a
+href="../20200123064406.GB124954@kroah.com/">Greg Kroah-Hartman</a>
+</pre><hr><pre
+id=R><b>Reply instructions:</b>
+
+You may reply publicly to <a
+href=#t>this message</a> via plain-text email
+using any one of the following methods:
+
+* Save the following mbox file, import it into your mail client,
+  and reply-to-all from there: <a
+href=raw>mbox</a>
+
+  Avoid top-posting and favor interleaved quoting:
+  <a
+href="https://en.wikipedia.org/wiki/Posting_style#Interleaved_style">https://en.wikipedia.org/wiki/Posting_style#Interleaved_style</a>
+
+* Reply using the <b>--to</b>, <b>--cc</b>, and <b>--in-reply-to</b>
+  switches of git-send-email(1):
+
+  git send-email \
+    --in-reply-to=20200122092836.708846182@linuxfoundation.org \
+    --to=gregkh@linuxfoundation.org \
+    --cc=johan@kernel.org \
+    --cc=kristian.evensen@gmail.com \
+    --cc=linux-kernel@vger.kernel.org \
+    --cc=stable@vger.kernel.org \
+    --subject=&#39;Re: [PATCH 5.4 044/222] USB: serial: option: Add support for Quectel RM500Q&#39; \
+    /path/to/YOUR_REPLY
+
+  <a
+href="https://kernel.org/pub/software/scm/git/docs/git-send-email.html">https://kernel.org/pub/software/scm/git/docs/git-send-email.html</a>
+
+* If your mail client supports setting the <b>In-Reply-To</b> header
+  via mailto: links, try the <a
+href="mailto:gregkh%40linuxfoundation.org?In-Reply-To=%3C20200122092836.708846182@linuxfoundation.org%3E&#38;Cc=johan%40kernel.org%2Ckristian.evensen%40gmail.com%2Clinux-kernel%40vger.kernel.org%2Cstable%40vger.kernel.org&#38;Subject=Re%3A%20%5BPATCH%205.4%20044%2F222%5D%20USB%3A%20serial%3A%20option%3A%20Add%20support%20for%20Quectel%20RM500Q">mailto: link</a>
+</pre>
+<hr><pre>This is a public inbox, see <a
+href="../_/text/mirror/">mirroring instructions</a>
+for how to clone and mirror all data and code used for this inbox;
+as well as URLs for NNTP newsgroup(s).</pre></body></html>
